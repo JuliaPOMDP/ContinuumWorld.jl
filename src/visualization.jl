@@ -3,10 +3,15 @@ type CWorldVis
     w::CWorld
     s::Nullable{Vec2}
     f::Nullable{Function}
+    g::Nullable{AbstractGrid}
 end
 
-function CWorldVis(w::CWorld; s=Nullable{Vec2}(), f=Nullable{Function})
-    return CWorldVis(w, s, f)
+function CWorldVis(w::CWorld;
+                   s=Nullable{Vec2}(),
+                   f=Nullable{Function},
+                   g=Nullable{AbstractGrid}
+                  )
+    return CWorldVis(w, s, f, g)
 end
 
 #=
@@ -60,18 +65,17 @@ function write_file(v::CWorldVis, fname::String)
         end
         p = surface(xs, ys, zg, 5)
     end
+    if !isnull(v.g)
+        g = get(v.g)
+    end
     endprint()
 end
 
-function Base.show(io::IO, mime::MIME"image/png", v::CWorldVis)
-    #=
-    tmpeps = tempname()*".eps"
-    write_file(v, tmpeps)
-    tmppng = tempname()*".png"
-    run(`convert -flatten $tmpeps $tmppng`)
-    =#
+Base.show(io::IO, m::MIME"image/tif", v::CWorldVis) = show(io, "tif", v)
+# Base.show(io::IO, MIME"image/png", v::CWorldVis) = show(io, "png", v)
 
-    tmppng = tempname()*".png"
+function Base.show(io::IO, imagetype::String, v::CWorldVis)
+    tmppng = tempname()*imagetype
     write_file(v, tmppng)
 
     open(tmppng) do f

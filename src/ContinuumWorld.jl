@@ -20,7 +20,7 @@ export
     evaluate,
     plot
 
-typealias Vec2 SVector{2, Float64}
+const Vec2 = SVector{2, Float64}
 
 immutable CircularRegion
     center::Vec2
@@ -50,13 +50,14 @@ const default_rewards = [-10.0, -5.0, 10.0, 3.0]
 end
 
 actions(w::CWorld) = w.actions
+n_actions(w::CWorld) = length(w.actions)
 discount(w::CWorld) = w.discount
 
 function generate_s(w::CWorld, s::Vec2, a::Vec2, rng::AbstractRNG)
     return s + a + w.stdev*randn(rng, Vec2)
 end
 
-function reward(w::CWorld, s, a, sp) # XXX inefficient
+function reward(w::CWorld, s::Vec2, a::Vec2, sp::Vec2) # XXX inefficient
     rew = 0.0
     for (i,r) in enumerate(w.reward_regions)
         if sp in r
@@ -66,7 +67,7 @@ function reward(w::CWorld, s, a, sp) # XXX inefficient
     return rew
 end
 
-function isterminal(w::CWorld, s) # XXX inefficient
+function isterminal(w::CWorld, s::Vec2) # XXX inefficient
     for r in w.terminal
         if s in r
             return true
@@ -75,6 +76,11 @@ function isterminal(w::CWorld, s) # XXX inefficient
     return false
 end
 
+function initial_state(w::CWorld, rng::AbstractRNG)
+    x = w.xlim[1] + (w.xlim[2] - w.xlim[1]) * rand(rng)
+    y = w.ylim[1] + (w.ylim[2] - w.ylim[1]) * rand(rng)
+    return Vec2(x,y)
+end
 
 include("solver.jl")
 include("visualization.jl")
