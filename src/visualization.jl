@@ -4,14 +4,15 @@ type CWorldVis
     s::Nullable{Vec2}
     f::Nullable{Function}
     g::Nullable{AbstractGrid}
+    title::Nullable{String}
 end
 
 function CWorldVis(w::CWorld;
                    s=Nullable{Vec2}(),
-                   f=Nullable{Function},
-                   g=Nullable{AbstractGrid}
-                  )
-    return CWorldVis(w, s, f, g)
+                   f=Nullable{Function}(),
+                   g=Nullable{AbstractGrid}(),
+                   title=Nullable{String}())
+    return CWorldVis(w, s, f, g, title)
 end
 
 #=
@@ -67,12 +68,21 @@ function write_file(v::CWorldVis, fname::String)
     end
     if !isnull(v.g)
         g = get(v.g)
+        xs = collect(ind2x(g, i)[1] for i in 1:length(g))
+        ys = collect(ind2x(g, i)[2] for i in 1:length(g))
+        setmarkertype(2)
+        setmarkercolorind(4)
+        setmarkersize(0.7)
+        polymarker(xs, ys)
+    end
+    if !isnull(v.title)
+        text(0.5, 0.95, get(v.title))
     end
     endprint()
 end
 
-Base.show(io::IO, m::MIME"image/tif", v::CWorldVis) = show(io, "tif", v)
-# Base.show(io::IO, MIME"image/png", v::CWorldVis) = show(io, "png", v)
+# Base.show(io::IO, m::MIME"image/tif", v::CWorldVis) = show(io, "tif", v)
+Base.show(io::IO, m::MIME"image/png", v::CWorldVis) = show(io, "png", v)
 
 function Base.show(io::IO, imagetype::String, v::CWorldVis)
     tmppng = tempname()*imagetype

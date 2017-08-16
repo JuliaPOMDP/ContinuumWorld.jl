@@ -18,7 +18,8 @@ export
     
     write_file,
     evaluate,
-    plot
+    plot,
+    action_ind
 
 const Vec2 = SVector{2, Float64}
 
@@ -53,11 +54,11 @@ actions(w::CWorld) = w.actions
 n_actions(w::CWorld) = length(w.actions)
 discount(w::CWorld) = w.discount
 
-function generate_s(w::CWorld, s::Vec2, a::Vec2, rng::AbstractRNG)
+function generate_s(w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
     return s + a + w.stdev*randn(rng, Vec2)
 end
 
-function reward(w::CWorld, s::Vec2, a::Vec2, sp::Vec2) # XXX inefficient
+function reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::AbstractVector) # XXX inefficient
     rew = 0.0
     for (i,r) in enumerate(w.reward_regions)
         if sp in r
