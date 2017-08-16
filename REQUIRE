@@ -1,5 +1,7 @@
 julia 0.6
 POMDPs
 StaticArrays
-GridInterpolations
+Parameters
 GR
+GridInterpolations
+POMDPToolbox
