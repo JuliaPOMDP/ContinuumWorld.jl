@@ -47,6 +47,7 @@ function write_file(v::CWorldVis, fname::String)
     beginprint(fname)
     setcolormap(2)
     clearws()
+    setwsviewport(0.0, 0.03, 0.0, 0.03)
     setwindow(v.w.xlim..., v.w.ylim...)
     axes(1, 1, 0, 0, 2, 2, 0.01)
     setspace(-10.0, 10.0, 0, 90)
@@ -76,7 +77,7 @@ function write_file(v::CWorldVis, fname::String)
         polymarker(xs, ys)
     end
     if !isnull(v.title)
-        text(0.5, 0.95, get(v.title))
+        text(0.6, 0.85, get(v.title))
     end
     endprint()
 end
@@ -85,7 +86,7 @@ end
 Base.show(io::IO, m::MIME"image/png", v::CWorldVis) = show(io, "png", v)
 
 function Base.show(io::IO, imagetype::String, v::CWorldVis)
-    tmppng = tempname()*imagetype
+    tmppng = tempname()*"."*imagetype
     write_file(v, tmppng)
 
     open(tmppng) do f
