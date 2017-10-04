@@ -5,9 +5,9 @@ module ContinuumWorld
 importall POMDPs
 using StaticArrays
 using Parameters
-using GR
 using GridInterpolations
 using POMDPToolbox
+using Plots
 
 export
     CWorld,
@@ -16,9 +16,7 @@ export
     Vec2,
     CWorldSolver,
     
-    write_file,
     evaluate,
-    plot,
     action_ind
 
 const Vec2 = SVector{2, Float64}
