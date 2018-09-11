@@ -7,10 +7,10 @@ mutable struct CWorldVis
 end
 
 function CWorldVis(w::CWorld;
-                   s=Union{Vec2, Nothing}(),
-                   f=Union{Function, Nothing}(),
-                   g=Union{AbstractGrid, Nothing}(),
-                   title=Union{String, Nothing}())
+                   s=nothing,
+                   f=nothing,
+                   g=nothing,
+                   title=nothing)
     return CWorldVis(w, s, f, g, title)
 end
 
@@ -18,18 +18,18 @@ end
     xlim --> v.w.xlim
     ylim --> v.w.ylim
     aspect_ratio --> 1
-    title --> get(v.title, "Continuum World")
+    title --> (v.title === nothing) ? "Continuum World" : v.title
     if v.f !== nothing
         @series begin
-            f = get(v.f)
+            f = v.f
             width = v.w.xlim[2]-v.w.xlim[1]
             height = v.w.ylim[2]-v.w.ylim[1]
             n = 200 # number of pixels
             nx = round(Int, sqrt(n^2*width/height))
             ny = round(Int, sqrt(n^2*height/width))
-            xs = linspace(v.w.xlim..., nx)
-            ys = linspace(v.w.ylim..., ny)
-            zg = Array{Float64}(nx, ny)
+            xs = range(v.w.xlim[1], stop=v.w.xlim[2], length=nx)
+            ys = range(v.w.ylim[1], stop=v.w.ylim[2], length=ny)
+            zg = Array{Float64}(undef, nx, ny)
             for i in 1:nx
                 for j in 1:ny
                     zg[j,i] = f(Vec2(xs[i], ys[j]))
@@ -42,7 +42,7 @@ end
     end
     if v.g !== nothing
         @series begin
-            g = get(v.g)
+            g = v.g
             xs = collect(ind2x(g, i)[1] for i in 1:length(g))
             ys = collect(ind2x(g, i)[2] for i in 1:length(g))
             label --> "Grid"

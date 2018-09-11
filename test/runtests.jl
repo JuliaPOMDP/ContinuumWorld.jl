@@ -2,6 +2,7 @@ using ContinuumWorld
 using POMDPs
 using POMDPModelTools
 using POMDPModels
+using POMDPSimulators
 using Test
 using Plots
 using Random

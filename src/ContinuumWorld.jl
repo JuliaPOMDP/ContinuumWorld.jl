@@ -2,6 +2,7 @@ module ContinuumWorld
 
 # package code goes here
 using Random
+using LinearAlgebra
 using POMDPs
 using StaticArrays
 using Parameters
@@ -27,7 +28,7 @@ struct CircularRegion
     radius::Float64
 end
 
-Base.in(v::Vec2, r::CircularRegion) = norm(v-r.center) <= r.radius
+Base.in(v::Vec2, r::CircularRegion) = LinearAlgebra.norm(v-r.center) <= r.radius
 
 const card_and_stay = [Vec2(1.0, 0.0), Vec2(-1.0, 0.0), Vec2(0.0, 1.0), Vec2(0.0, -1.0), Vec2(0.0, 0.0)]
 const cardinal = [Vec2(1.0, 0.0), Vec2(-1.0, 0.0), Vec2(0.0, 1.0), Vec2(0.0, -1.0)]
@@ -49,15 +50,15 @@ const default_rewards = [-10.0, -5.0, 10.0, 3.0]
     discount::Float64                               = 0.95
 end
 
-actions(w::CWorld) = w.actions
-n_actions(w::CWorld) = length(w.actions)
-discount(w::CWorld) = w.discount
+POMDPs.actions(w::CWorld) = w.actions
+POMDPs.n_actions(w::CWorld) = length(w.actions)
+POMDPs.discount(w::CWorld) = w.discount
 
-function generate_s(w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
+function POMDPs.generate_s(w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
     return s + a + w.stdev*randn(rng, Vec2)
 end
 
-function reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::AbstractVector) # XXX inefficient
+function POMDPs.reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::AbstractVector) # XXX inefficient
     rew = 0.0
     for (i,r) in enumerate(w.reward_regions)
         if sp in r
@@ -67,7 +68,7 @@ function reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::AbstractVec
     return rew
 end
 
-function isterminal(w::CWorld, s::Vec2) # XXX inefficient
+function POMDPs.isterminal(w::CWorld, s::Vec2) # XXX inefficient
     for r in w.terminal
         if s in r
             return true
@@ -76,7 +77,7 @@ function isterminal(w::CWorld, s::Vec2) # XXX inefficient
     return false
 end
 
-function initial_state(w::CWorld, rng::AbstractRNG)
+function POMDPs.initialstate(w::CWorld, rng::AbstractRNG)
     x = w.xlim[1] + (w.xlim[2] - w.xlim[1]) * rand(rng)
     y = w.ylim[1] + (w.ylim[2] - w.ylim[1]) * rand(rng)
     return Vec2(x,y)
