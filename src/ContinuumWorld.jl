@@ -1,12 +1,13 @@
 module ContinuumWorld
 
 # package code goes here
-
-importall POMDPs
+using Random
+using POMDPs
 using StaticArrays
 using Parameters
 using GridInterpolations
-using POMDPToolbox
+using POMDPModelTools
+using POMDPModels
 using Plots
 
 export
@@ -21,7 +22,7 @@ export
 
 const Vec2 = SVector{2, Float64}
 
-immutable CircularRegion
+struct CircularRegion
     center::Vec2
     radius::Float64
 end
@@ -37,7 +38,7 @@ const default_regions = [CircularRegion(Vec2(3.5, 2.5), 0.5),
 const default_rewards = [-10.0, -5.0, 10.0, 3.0]
 
 
-@with_kw immutable CWorld <: MDP{Vec2, Vec2}
+@with_kw struct CWorld <: MDP{Vec2, Vec2}
     xlim::Tuple{Float64, Float64}                   = (0.0, 10.0)
     ylim::Tuple{Float64, Float64}                   = (0.0, 10.0)
     reward_regions::Vector{CircularRegion}          = default_regions

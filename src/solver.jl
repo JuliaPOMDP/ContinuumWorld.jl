@@ -1,11 +1,11 @@
-immutable GIValue{G <: AbstractGrid}
+struct GIValue{G <: AbstractGrid}
     grid::G
     gdata::Vector{Float64}
 end
 
 evaluate(v::GIValue, s::AbstractVector{Float64}) = interpolate(v.grid, v.gdata, convert(Vector{Float64}, s))
 
-@with_kw type CWorldSolver{G<:AbstractGrid, RNG<:AbstractRNG} <: Solver
+@with_kw struct CWorldSolver{G<:AbstractGrid, RNG<:AbstractRNG} <: Solver
     grid::G                     = RectangleGrid(linspace(0.0,10.0, 30), linspace(0.0, 10.0, 30))
     max_iters::Int              = 50
     tol::Float64                = 0.01

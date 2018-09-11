@@ -1,17 +1,16 @@
-
-type CWorldVis
+mutable struct CWorldVis
     w::CWorld
-    s::Nullable{Vec2}
-    f::Nullable{Function}
-    g::Nullable{AbstractGrid}
-    title::Nullable{String}
+    s::Union{Vec2, Nothing}
+    f::Union{Function, Nothing}
+    g::Union{AbstractGrid, Nothing}
+    title::Union{String, Nothing}
 end
 
 function CWorldVis(w::CWorld;
-                   s=Nullable{Vec2}(),
-                   f=Nullable{Function}(),
-                   g=Nullable{AbstractGrid}(),
-                   title=Nullable{String}())
+                   s=Union{Vec2, Nothing}(),
+                   f=Union{Function, Nothing}(),
+                   g=Union{AbstractGrid, Nothing}(),
+                   title=Union{String, Nothing}())
     return CWorldVis(w, s, f, g, title)
 end
 
@@ -20,7 +19,7 @@ end
     ylim --> v.w.ylim
     aspect_ratio --> 1
     title --> get(v.title, "Continuum World")
-    if !isnull(v.f)
+    if v.f !== nothing
         @series begin
             f = get(v.f)
             width = v.w.xlim[2]-v.w.xlim[1]
@@ -41,7 +40,7 @@ end
             xs, ys, zg
         end
     end
-    if !isnull(v.g)
+    if v.g !== nothing
         @series begin
             g = get(v.g)
             xs = collect(ind2x(g, i)[1] for i in 1:length(g))
