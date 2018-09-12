@@ -11,7 +11,7 @@ evaluate(v::GIValue, s::AbstractVector{Float64}) = interpolate(v.grid, v.gdata, 
     tol::Float64                = 0.01
     m::Int                      = 20
     value_hist::AbstractVector  = []
-    rng::RNG                    = Base.GLOBAL_RNG
+    rng::RNG                    = Random.GLOBAL_RNG
 end
 
 struct CWorldPolicy{V} <: Policy
@@ -32,7 +32,7 @@ function POMDPs.solve(sol::CWorldSolver, w::CWorld)
                 newdata[i] = 0.0
             else
                 best_Qsum = -Inf
-                for a in iterator(actions(w, s))
+                for a in actions(w, s)
                     Qsum = 0.0
                     for j in 1:sol.m
                         sp, r = generate_sr(w, s, a, sol.rng)
@@ -51,7 +51,7 @@ function POMDPs.solve(sol::CWorldSolver, w::CWorld)
     print("\nextracting policy...     ")
 
     Qs = Vector{GIValue}(undef,n_actions(w))
-    acts = collect(iterator(actions(w)))
+    acts = collect(actions(w))
     for j in 1:n_actions(w)
         a = acts[j]
         qdata = similar(val.gdata)

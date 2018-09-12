@@ -10,6 +10,7 @@ using GridInterpolations
 using POMDPModelTools
 using POMDPModels
 using Plots
+plotly()
 
 export
     CWorld,
