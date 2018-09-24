@@ -1,17 +1,17 @@
-immutable GIValue{G <: AbstractGrid}
+struct GIValue{G <: AbstractGrid}
     grid::G
     gdata::Vector{Float64}
 end
 
 evaluate(v::GIValue, s::AbstractVector{Float64}) = interpolate(v.grid, v.gdata, convert(Vector{Float64}, s))
 
-@with_kw type CWorldSolver{G<:AbstractGrid, RNG<:AbstractRNG} <: Solver
-    grid::G                     = RectangleGrid(linspace(0.0,10.0, 30), linspace(0.0, 10.0, 30))
+@with_kw mutable struct CWorldSolver{G<:AbstractGrid, RNG<:AbstractRNG} <: Solver
+    grid::G                     = RectangleGrid(range(0.0, stop=10.0, length=30), range(0.0, stop=10.0, length=30))
     max_iters::Int              = 50
     tol::Float64                = 0.01
     m::Int                      = 20
     value_hist::AbstractVector  = []
-    rng::RNG                    = Base.GLOBAL_RNG
+    rng::RNG                    = Random.GLOBAL_RNG
 end
 
 struct CWorldPolicy{V} <: Policy
@@ -19,7 +19,7 @@ struct CWorldPolicy{V} <: Policy
     Qs::Vector{V}
 end
 
-function solve(sol::CWorldSolver, w::CWorld)
+function POMDPs.solve(sol::CWorldSolver, w::CWorld)
     sol.value_hist = []
     data = zeros(length(sol.grid))
     val = GIValue(sol.grid, data)
@@ -32,7 +32,7 @@ function solve(sol::CWorldSolver, w::CWorld)
                 newdata[i] = 0.0
             else
                 best_Qsum = -Inf
-                for a in iterator(actions(w, s))
+                for a in actions(w, s)
                     Qsum = 0.0
                     for j in 1:sol.m
                         sp, r = generate_sr(w, s, a, sol.rng)
@@ -50,8 +50,8 @@ function solve(sol::CWorldSolver, w::CWorld)
 
     print("\nextracting policy...     ")
 
-    Qs = Vector{GIValue}(n_actions(w))
-    acts = collect(iterator(actions(w)))
+    Qs = Vector{GIValue}(undef,n_actions(w))
+    acts = collect(actions(w))
     for j in 1:n_actions(w)
         a = acts[j]
         qdata = similar(val.gdata)
@@ -75,11 +75,11 @@ function solve(sol::CWorldSolver, w::CWorld)
     return CWorldPolicy(acts, Qs)
 end
 
-function action(p::CWorldPolicy, s::AbstractVector{Float64})
+function POMDPs.action(p::CWorldPolicy, s::AbstractVector{Float64})
     best = action_ind(p, s)
     return p.actions[best]
 end
 
-action_ind(p::CWorldPolicy, s::AbstractVector{Float64}) = indmax(evaluate(Q, s) for Q in p.Qs)
+action_ind(p::CWorldPolicy, s::AbstractVector{Float64}) = argmax([evaluate(Q, s) for Q in p.Qs])
 
-value(p::CWorldPolicy, s::AbstractVector{Float64}) = maximum(evaluate(Q, s) for Q in p.Qs)
+POMDPs.value(p::CWorldPolicy, s::AbstractVector{Float64}) = maximum([evaluate(Q, s) for Q in p.Qs])

@@ -1,8 +1,11 @@
 using ContinuumWorld
 using POMDPs
-using POMDPToolbox
-using Base.Test
+using POMDPModelTools
+using POMDPModels
+using POMDPSimulators
+using Test
 using Plots
+using Random
 
 w = CWorld()
 
