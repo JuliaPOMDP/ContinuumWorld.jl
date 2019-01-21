@@ -18,7 +18,7 @@ end
     xlim --> v.w.xlim
     ylim --> v.w.ylim
     aspect_ratio --> 1
-    title --> (v.title === nothing) ? "Continuum World" : v.title
+    title --> something(v.title, "Continuum World")
     if v.f !== nothing
         @series begin
             f = v.f
