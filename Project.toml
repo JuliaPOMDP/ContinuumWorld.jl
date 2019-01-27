@@ -1,7 +1,7 @@
 name = "ContinuumWorld"
 uuid = "5cbb95a3-277b-5373-895a-7e14bd91b3cc"
 repo = "https://github.com/JuliaPOMDP/ContinuumWorld.jl"
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 GridInterpolations = "bb4c363b-b914-514b-8517-4eb369bc008a"
