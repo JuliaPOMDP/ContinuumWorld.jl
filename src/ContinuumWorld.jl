@@ -55,7 +55,7 @@ POMDPs.actions(w::CWorld) = w.actions
 POMDPs.n_actions(w::CWorld) = length(w.actions)
 POMDPs.discount(w::CWorld) = w.discount
 
-function POMDPs.generate_s(w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
+function POMDPs.gen(::DDNNode{:sp}, w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
     return s + a + w.stdev*randn(rng, Vec2)
 end
 
