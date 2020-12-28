@@ -9,6 +9,9 @@ using Parameters
 using GridInterpolations
 using POMDPModelTools
 using POMDPModels
+using Distributions
+using Statistics
+using StatsBase
 using Plots
 plotly()
 
@@ -39,7 +42,6 @@ const default_regions = [CircularRegion(Vec2(3.5, 2.5), 0.5),
                          CircularRegion(Vec2(7.5, 7.5), 0.5)]
 const default_rewards = [-10.0, -5.0, 10.0, 3.0]
 
-
 @with_kw struct CWorld <: MDP{Vec2, Vec2}
     xlim::Tuple{Float64, Float64}                   = (0.0, 10.0)
     ylim::Tuple{Float64, Float64}                   = (0.0, 10.0)
@@ -52,11 +54,11 @@ const default_rewards = [-10.0, -5.0, 10.0, 3.0]
 end
 
 POMDPs.actions(w::CWorld) = w.actions
-POMDPs.n_actions(w::CWorld) = length(w.actions)
 POMDPs.discount(w::CWorld) = w.discount
 
-function POMDPs.gen(::DDNNode{:sp}, w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
-    return s + a + w.stdev*randn(rng, Vec2)
+function POMDPs.gen(w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
+    sp = s + a + w.stdev*randn(rng, Vec2)
+    return (sp=sp,)
 end
 
 function POMDPs.reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::AbstractVector) # XXX inefficient
@@ -78,10 +80,30 @@ function POMDPs.isterminal(w::CWorld, s::Vec2) # XXX inefficient
     return false
 end
 
-function POMDPs.initialstate(w::CWorld, rng::AbstractRNG)
-    x = w.xlim[1] + (w.xlim[2] - w.xlim[1]) * rand(rng)
-    y = w.ylim[1] + (w.ylim[2] - w.ylim[1]) * rand(rng)
+struct Vec2Distribution
+    xlim::Tuple{Float64,Float64}
+    ylim::Tuple{Float64,Float64}
+    d::Product #for support functions
+
+    function Vec2Distribution(xlim::Tuple{Float64,Float64}, ylim::Tuple{Float64,Float64})
+        d = Product([Distributions.Uniform(xlim[1], xlim[2]), Distributions.Uniform(ylim[1], ylim[2])])
+        new(xlim, ylim, d)
+    end
+end
+
+function Base.rand(rng::Random.AbstractRNG, v::Vec2Distribution)
+    x = v.xlim[1] + (v.xlim[2]-v.xlim[1])*rand(rng) #sampling from Product allocates a Vector, avoid by sampling manually
+    y = v.ylim[1] + (v.ylim[2]-v.ylim[1])*rand(rng)
     return Vec2(x,y)
+end
+
+Distributions.pdf(v::Vec2Distribution, x) = pdf(v.d, x)
+Distributions.support(v::Vec2Distribution) = support(v.d)
+StatsBase.mode(v::Vec2Distribution) = mode(v.d)
+Statistics.mean(v::Vec2Distribution) = mean(v.d)
+
+function POMDPs.initialstate(w::CWorld)
+    return Vec2Distribution(w.xlim, w.ylim)
 end
 
 include("solver.jl")
