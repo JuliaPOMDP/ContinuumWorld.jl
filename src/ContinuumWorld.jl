@@ -56,9 +56,10 @@ end
 POMDPs.actions(w::CWorld) = w.actions
 POMDPs.discount(w::CWorld) = w.discount
 
-function POMDPs.gen(w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
-    sp = s + a + w.stdev*randn(rng, Vec2)
-    return (sp=sp,)
+function POMDPs.transition(w::CWorld, s::AbstractVector, a::AbstractVector)
+    ImplicitDistribution(w, s, a) do w, s, a, rng
+        return s + a + w.stdev*randn(rng, Vec2)
+    end
 end
 
 function POMDPs.reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::AbstractVector) # XXX inefficient
