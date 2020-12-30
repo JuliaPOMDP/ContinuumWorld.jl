@@ -35,7 +35,7 @@ function POMDPs.solve(sol::CWorldSolver, w::CWorld)
                 for a in actions(w, s)
                     Qsum = 0.0
                     for j in 1:sol.m
-                        sp, r = gen(DDNOut(:sp, :r), w, s, a, sol.rng)
+                        sp, r = @gen(:sp, :r)(w, s, a, sol.rng)
                         Qsum += r + discount(w)*evaluate(val, sp)
                     end
                     best_Qsum = max(best_Qsum, Qsum)
@@ -50,9 +50,9 @@ function POMDPs.solve(sol::CWorldSolver, w::CWorld)
 
     print("\nextracting policy...     ")
 
-    Qs = Vector{GIValue}(undef,n_actions(w))
     acts = collect(actions(w))
-    for j in 1:n_actions(w)
+    Qs = Vector{GIValue}(undef,length(acts))
+    for j in 1:length(acts)
         a = acts[j]
         qdata = similar(val.gdata)
         for i in 1:length(sol.grid)
@@ -62,7 +62,7 @@ function POMDPs.solve(sol::CWorldSolver, w::CWorld)
             else
                 Qsum = 0.0
                 for k in 1:sol.m
-                    sp, r = gen(DDNOut(:sp, :r), w, s, a, sol.rng)
+                    sp, r = @gen(:sp, :r)(w, s, a, sol.rng)
                     Qsum += r + discount(w)*evaluate(val, sp)
                 end
                 qdata[i] = Qsum/sol.m

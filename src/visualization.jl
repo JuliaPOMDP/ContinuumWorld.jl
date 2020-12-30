@@ -15,8 +15,8 @@ function CWorldVis(w::CWorld;
 end
 
 @recipe function f(v::CWorldVis)
-    xlim --> v.w.xlim
-    ylim --> v.w.ylim
+    xlims --> v.w.xlim
+    ylims --> v.w.ylim
     aspect_ratio --> 1
     title --> something(v.title, "Continuum World")
     if v.f !== nothing
@@ -35,7 +35,7 @@ end
                     zg[j,i] = f(Vec2(xs[i], ys[j]))
                 end
             end
-            color --> cgrad([:red, :white, :green])
+            seriescolor --> cgrad([:red, :white, :green])
             seriestype := :heatmap
             xs, ys, zg
         end
