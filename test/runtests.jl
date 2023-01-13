@@ -9,7 +9,7 @@ using Random
 
 w = CWorld()
 
-@inferred gen(DDNOut(:sp, :r), w, [3,2], [4,2], MersenneTwister(19))
+@inferred @gen(:sp, :r)(w, [3,2], [4,2], MersenneTwister(19))
 
 sol = CWorldSolver(rng=MersenneTwister(7))
 pol = solve(sol, w)
