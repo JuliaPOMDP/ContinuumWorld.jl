@@ -2,10 +2,11 @@ using ContinuumWorld
 using POMDPs
 using POMDPModelTools
 using POMDPModels
-using POMDPSimulators
 using Test
 using Plots
+using Plotly
 using Random
+using POMDPTools
 
 w = CWorld()
 
@@ -25,4 +26,4 @@ write_file(CWorldVis(w, f=norm), joinpath(tempdir(), "test.png"))
 @time write_file(CWorldVis(w, f=s->action_ind(pol, s), g=sol.grid, title="Policy"), joinpath(tempdir(), "policy.png"))
 @time write_file(CWorldVis(w, f=s->value(pol, s), g=sol.grid, title="Value"), joinpath(tempdir(), "value.png"))
 =#
-plot(CWorldVis(w, f=s->value(pol, s), g=sol.grid, title="Value"))
+Plots.plot(CWorldVis(w, f=s->value(pol, s), g=sol.grid, title="Value"))

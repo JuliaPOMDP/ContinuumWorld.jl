@@ -13,8 +13,8 @@ using Distributions
 using Statistics
 using StatsBase
 using Plots
-plotly()
-
+# plotly()
+using Plotly
 export
     CWorld,
     CWorldVis,
