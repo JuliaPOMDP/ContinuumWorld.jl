@@ -2,11 +2,9 @@ name: Run ContinuumWorld Tests
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   pull_request:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
   test:
@@ -20,20 +18,28 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.9'  # Or '1.10' if you want to use the latest
+          version: '1.9'
 
       - name: Cache Julia packages
         uses: actions/cache@v3
         with:
           path: ~/.julia/artifacts
           key: ${{ runner.os }}-julia-artifacts-${{ hashFiles('**/Project.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-julia-artifacts-
+          restore-keys: ${{ runner.os }}-julia-artifacts-
 
-      - name: Install dependencies
+      - name: Install dependencies quickly
         run: |
-          julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.resolve()'
+          julia --project -e '
+            using Pkg
+            Pkg.develop(path=".")
+            Pkg.instantiate()
+            Pkg.resolve()
+          '
 
-      - name: Run tests
+      - name: Run tests (fast mode, no plotting)
         run: |
-          julia --project -e 'using Pkg; Pkg.test()'
+          julia --project -e '
+            ENV["CI_NO_PLOTS"] = "true"
+            using Pkg
+            Pkg.test()
+          '
