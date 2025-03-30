@@ -1,16 +1,39 @@
-name: CI
+name: Run ContinuumWorld Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test:
+    name: Julia Tests
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v1
         with:
-          version: '1'
-          arch: x64
-      - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-runtest@v1
+          version: '1.9'  # Or '1.10' if you want to use the latest
+
+      - name: Cache Julia packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-julia-artifacts-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-julia-artifacts-
+
+      - name: Install dependencies
+        run: |
+          julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.resolve()'
+
+      - name: Run tests
+        run: |
+          julia --project -e 'using Pkg; Pkg.test()'
