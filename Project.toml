@@ -1,13 +1,14 @@
 name = "ContinuumWorld"
 uuid = "5cbb95a3-277b-5373-895a-7e14bd91b3cc"
-version = "0.3.0"
 repo = "https://github.com/JuliaPOMDP/ContinuumWorld.jl"
+version = "0.3.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 GridInterpolations = "bb4c363b-b914-514b-8517-4eb369bc008a"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-POMDPTools = "7588e00f-9cae-40de-98dc-e0c70c48cdd7"
+POMDPModelTools = "08074719-1b2a-587c-a292-00f91cc44415"
+POMDPModels = "355abbd5-f08e-5560-ac9e-8b5f2592a0ca"
 POMDPs = "a93abf59-7444-517b-a68a-c42f96afdd7d"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 Plotly = "58dd65bb-95f3-509e-9936-c39a10fdeae7"
@@ -18,23 +19,13 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-
+POMDPTools= "7588e00f-9cae-40de-98dc-e0c70c48cdd7"
 [compat]
-Distributions = "0.25"
-GridInterpolations = "0.1"
-POMDPTools = "0.1"
 POMDPs = "0.9"
-Parameters = "0.12"
-Plotly = "0.4"
-PlotlyBase = "0.8"
-PlotlyKaleido = "0.1"
-Plots = "1.38"
-StaticArrays = "1.5"
-StatsBase = "0.34"
-julia = "1.9"
 
 [extras]
+POMDPSimulators = "e0d0a172-29c6-5d4e-96d0-f262df5d01fd"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["Test", "POMDPSimulators"]
