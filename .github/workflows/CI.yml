@@ -1,4 +1,4 @@
-name: Run ContinuumWorld Tests
+name: CI
 
 on:
   push:
