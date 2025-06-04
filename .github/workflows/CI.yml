@@ -20,7 +20,7 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.9'  # Change to '1.10' if desired
+          version: '1.9'  # You can switch to '1.10' if you're using it
 
       - name: Cache Julia packages
         uses: actions/cache@v3
