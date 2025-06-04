@@ -1,4 +1,4 @@
-name: CI
+name: Run ContinuumWorld Tests
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.9'  # You can switch to '1.10' if you're using it
+          version: '1.9'
 
       - name: Cache Julia packages
         uses: actions/cache@v3
@@ -35,18 +35,17 @@ jobs:
           julia --project -e '
             using Pkg
             Pkg.instantiate()
+            Pkg.add("Coverage")
             Pkg.resolve()
           '
 
-      - name: Run tests
+      - name: Run tests and generate lcov.info
         run: |
-          julia --project -e '
-            using Pkg
-            Pkg.test()
-          '
+          julia --project test/runtests.jl
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Aero-Spec/ContinuumWorld.jl
+          files: lcov.info
