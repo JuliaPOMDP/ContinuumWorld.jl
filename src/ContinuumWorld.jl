@@ -89,7 +89,7 @@ struct Vec2Distribution
     ylim::Tuple{Float64, Float64}
     d::Product
     function Vec2Distribution(xlim, ylim)
-        d = Product([Uniform(xlim[1], xlim[2]), Uniform(ylim[1], ylim[2])])
+        d = Product([Distributions.Uniform(xlim[1], xlim[2]), Distributions.Uniform(ylim[1], ylim[2])])
         new(xlim, ylim, d)
     end
 end
