@@ -32,21 +32,14 @@ end
 
 Base.in(v::Vec2, r::CircularRegion) = norm(v - r.center) <= r.radius
 
-const card_and_stay = [
-    Vec2(1.0, 0.0), Vec2(-1.0, 0.0),
-    Vec2(0.0, 1.0), Vec2(0.0, -1.0),
-    Vec2(0.0, 0.0)
-]
-const cardinal = [
-    Vec2(1.0, 0.0), Vec2(-1.0, 0.0),
-    Vec2(0.0, 1.0), Vec2(0.0, -1.0)
-]
+const card_and_stay = [Vec2(1.0, 0.0), Vec2(-1.0, 0.0), Vec2(0.0, 1.0), Vec2(0.0, -1.0), Vec2(0.0, 0.0)]
+const cardinal = [Vec2(1.0, 0.0), Vec2(-1.0, 0.0), Vec2(0.0, 1.0), Vec2(0.0, -1.0)]
 
 const default_regions = [
     CircularRegion(Vec2(3.5, 2.5), 0.5),
     CircularRegion(Vec2(3.5, 5.5), 0.5),
     CircularRegion(Vec2(8.5, 2.5), 0.5),
-    CircularRegion(Vec2(7.5, 7.5), 0.5)
+    CircularRegion(Vec2(7.5, 7.5), 0.5),
 ]
 
 const default_rewards = [-10.0, -5.0, 10.0, 3.0]
@@ -67,7 +60,13 @@ POMDPs.discount(w::CWorld) = w.discount
 
 function POMDPs.transition(w::CWorld, s::AbstractVector, a::AbstractVector)
     ImplicitDistribution(w, s, a) do w, s, a, rng
-        return s + a + w.stdev * randn(rng, Vec2)
+        s + a + w.stdev * randn(rng, Vec2)
+    end
+end
+
+function POMDPs.transition(w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
+    ImplicitDistribution(w, s, a) do w, s, a, rng
+        s + a + w.stdev * randn(rng, Vec2)
     end
 end
 
@@ -82,24 +81,15 @@ function POMDPs.reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::Abst
 end
 
 function POMDPs.isterminal(w::CWorld, s::Vec2)
-    for r in w.terminal
-        if s in r
-            return true
-        end
-    end
-    return false
+    any(r -> s in r, w.terminal)
 end
 
 struct Vec2Distribution
     xlim::Tuple{Float64, Float64}
     ylim::Tuple{Float64, Float64}
     d::Product
-
-    function Vec2Distribution(xlim::Tuple{Float64, Float64}, ylim::Tuple{Float64, Float64})
-        d = Product([
-            Uniform(xlim[1], xlim[2]),
-            Uniform(ylim[1], ylim[2])
-        ])
+    function Vec2Distribution(xlim, ylim)
+        d = Product([Uniform(xlim[1], xlim[2]), Uniform(ylim[1], ylim[2])])
         new(xlim, ylim, d)
     end
 end
@@ -116,7 +106,7 @@ StatsBase.mode(v::Vec2Distribution) = mode(v.d)
 Statistics.mean(v::Vec2Distribution) = mean(v.d)
 
 function POMDPs.initialstate(w::CWorld)
-    return Vec2Distribution(w.xlim, w.ylim)
+    Vec2Distribution(w.xlim, w.ylim)
 end
 
 include("solver.jl")
