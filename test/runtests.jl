@@ -1,29 +1,35 @@
+using Test
 using ContinuumWorld
 using POMDPs
-using POMDPModelTools
-using POMDPModels
-using Test
+using POMDPTools
+using Random
 using Plots
 using Plotly
-using Random
-using POMDPTools
 
-w = CWorld()
+@testset "ContinuumWorld Tests" begin
+    # Create a basic CWorld environment
+    w = CWorld()
 
-@inferred @gen(:sp, :r)(w, [3,2], [4,2], MersenneTwister(19))
+    # Test generative model sampling
+    sp, r = @inferred @gen(:sp, :r)(w, [3.0, 2.0], [4.0, 2.0], MersenneTwister(19))
+    @test isa(sp, SVector{2, Float64})
+    @test isa(r, Float64)
 
-sol = CWorldSolver(rng=MersenneTwister(7))
-pol = solve(sol, w)
+    # Create and solve with custom solver
+    sol = CWorldSolver(rng=MersenneTwister(7))
+    pol = solve(sol, w)
+    @test isa(pol, CWorldPolicy)
 
-sim = HistoryRecorder(rng=MersenneTwister(5), max_steps=30)
-@show state_hist(simulate(sim, w, pol))
+    # Run simulation
+    sim = HistoryRecorder(rng=MersenneTwister(5), max_steps=30)
+    hist = simulate(sim, w, pol)
+    @test length(state_hist(hist)) > 0
+    @info "Simulation states:" state_hist(hist)
 
-#=
-write_file(CWorldVis(w, f=norm), joinpath(tempdir(), "test.png"))
-@time write_file(CWorldVis(w, f=norm, g=sol.grid), joinpath(tempdir(), "test_timed.png"))
-@time write_file(CWorldVis(w, f=norm), joinpath(tempdir(), "test_timed.tif"))
-@time write_file(CWorldVis(w, f=norm, g=sol.grid), joinpath(tempdir(), "test_timed.tif"))
-@time write_file(CWorldVis(w, f=s->action_ind(pol, s), g=sol.grid, title="Policy"), joinpath(tempdir(), "policy.png"))
-@time write_file(CWorldVis(w, f=s->value(pol, s), g=sol.grid, title="Value"), joinpath(tempdir(), "value.png"))
-=#
-Plots.plot(CWorldVis(w, f=s->value(pol, s), g=sol.grid, title="Value"))
+    # Visualization of value function
+    plt = Plots.plot(CWorldVis(w, f=s -> value(pol, s), g=sol.grid, title="Value"))
+    @test isa(plt, Plots.Plot)
+
+    # Optional: Save visualizations (commented out for CI use)
+    # savefig(plt, joinpath(tempdir(), "value_plot.png"))
+end
