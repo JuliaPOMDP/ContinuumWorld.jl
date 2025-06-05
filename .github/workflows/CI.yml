@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: Run tests
+    name: Run tests and upload coverage
     runs-on: ubuntu-latest
 
     steps:
@@ -40,5 +40,15 @@ jobs:
             Pkg.resolve()
           '
 
-      - name: Run tests
-        run: julia --project -e 'using Pkg; Pkg.test()'
+      - name: Run tests and generate coverage
+        run: |
+          julia --project -e '
+            using Pkg
+            Pkg.test(coverage=true)
+          '
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: Aero-Spec/ContinuumWorld.jl
