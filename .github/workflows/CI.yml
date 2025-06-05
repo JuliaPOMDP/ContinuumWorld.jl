@@ -1,4 +1,4 @@
-name: Run ContinuumWorld Tests
+name: Run tests and upload coverage
 
 on:
   push:
@@ -10,12 +10,14 @@ on:
 
 jobs:
   test:
-    name: Julia CI
+    name: Run tests and collect coverage
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v1
@@ -39,11 +41,10 @@ jobs:
             Pkg.resolve()
           '
 
-      - name: Run tests and generate lcov.info
-        run: |
-          julia --project test/runtests.jl
+      - name: Run tests and generate coverage
+        run: julia --project test/runtests.jl
 
-      - name: Upload coverage reports to Codecov
+      - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
