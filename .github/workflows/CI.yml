@@ -46,8 +46,8 @@ jobs:
           julia --project -e '
             using Pkg; Pkg.test()
             using Coverage
-            lcov_file = joinpath(@__DIR__, "../lcov.info")
-            Coverage.lcov(Coverage.process_folder(), lcov_file)
+            cov = Coverage.process_folder()
+            Coverage.LCOV.write(joinpath(@__DIR__, "../lcov.info"), cov)
           '
 
       - name: Upload results to Codecov
