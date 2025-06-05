@@ -41,7 +41,7 @@ jobs:
             Pkg.resolve()
           '
 
-      - name: Run tests and generate coverage report
+      - name: Run Tests
         run: |
           julia --project -e '
             using Pkg
