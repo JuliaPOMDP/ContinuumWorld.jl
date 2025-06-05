@@ -42,7 +42,13 @@ jobs:
           '
 
       - name: Run tests and generate coverage
-        run: julia --project test/runtests.jl
+        run: |
+          julia --project -e '
+            using Pkg; Pkg.test()
+            using Coverage
+            lcov_file = joinpath(@__DIR__, "../lcov.info")
+            Coverage.lcov(Coverage.process_folder(), lcov_file)
+          '
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
