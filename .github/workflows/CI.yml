@@ -37,14 +37,17 @@ jobs:
           julia --project -e '
             using Pkg
             Pkg.instantiate()
+            Pkg.add("Coverage")
             Pkg.resolve()
           '
 
-      - name: Run tests and generate coverage
+      - name: Run tests and generate coverage report
         run: |
           julia --project -e '
             using Pkg
             Pkg.test(coverage=true)
+            using Coverage
+            LCOV.writefile("lcov.info", process_folder("."))
           '
 
       - name: Upload coverage to Codecov
@@ -52,3 +55,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Aero-Spec/ContinuumWorld.jl
+          files: lcov.info
