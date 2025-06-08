@@ -35,8 +35,7 @@ function POMDPs.solve(sol::CWorldSolver, w::CWorld)
                 for a in actions(w)
                     Qsum = 0.0
                     for j in 1:sol.m
-                        sp = rand(transition(w, s, a, sol.rng))
-                        r = reward(w, s, a, sp)
+                        sp, r = @gen(:sp, :r)(w, s, a, sol.rng)
                         Qsum += r + discount(w) * evaluate(val, sp)
                     end
                     best_Qsum = max(best_Qsum, Qsum)
@@ -63,8 +62,7 @@ function POMDPs.solve(sol::CWorldSolver, w::CWorld)
             else
                 Qsum = 0.0
                 for k in 1:sol.m
-                    sp = rand(transition(w, s, a, sol.rng))
-                    r = reward(w, s, a, sp)
+                    sp, r = @gen(:sp, :r)(w, s, a, sol.rng)
                     Qsum += r + discount(w) * evaluate(val, sp)
                 end
                 qdata[i] = Qsum / sol.m
