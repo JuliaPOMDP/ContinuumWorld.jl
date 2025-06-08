@@ -7,10 +7,10 @@ mutable struct CWorldVis
 end
 
 function CWorldVis(w::CWorld;
-                   s::Union{Vec2, Nothing}=nothing,
-                   f::Union{Function, Nothing}=nothing,
-                   g::Union{AbstractGrid, Nothing}=nothing,
-                   title::Union{String, Nothing}=nothing)
+                   s=nothing,
+                   f=nothing,
+                   g=nothing,
+                   title=nothing)
     return CWorldVis(w, s, f, g, title)
 end
 
