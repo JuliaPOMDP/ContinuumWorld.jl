@@ -64,12 +64,6 @@ function POMDPs.transition(w::CWorld, s::AbstractVector, a::AbstractVector)
     end
 end
 
-function POMDPs.transition(w::CWorld, s::AbstractVector, a::AbstractVector, rng::AbstractRNG)
-    ImplicitDistribution(w, s, a) do w, s, a, rng
-        s + a + w.stdev * randn(rng, Vec2)
-    end
-end
-
 function POMDPs.reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::AbstractVector)
     rew = 0.0
     for (i, r) in enumerate(w.reward_regions)
@@ -87,15 +81,19 @@ end
 struct Vec2Distribution
     xlim::Tuple{Float64, Float64}
     ylim::Tuple{Float64, Float64}
-    d::Product
+    d::Product # for support functions
+
     function Vec2Distribution(xlim, ylim)
-        d = Product([Distributions.Uniform(xlim[1], xlim[2]), Distributions.Uniform(ylim[1], ylim[2])])
+        d = Product([
+            Distributions.Uniform(xlim[1], xlim[2]),
+            Distributions.Uniform(ylim[1], ylim[2])
+        ])
         new(xlim, ylim, d)
     end
 end
 
 function Base.rand(rng::AbstractRNG, v::Vec2Distribution)
-    x = v.xlim[1] + (v.xlim[2] - v.xlim[1]) * rand(rng)
+    x = v.xlim[1] + (v.xlim[2] - v.xlim[1]) * rand(rng) # sampling from Product allocates a Vector, avoid by sampling manually
     y = v.ylim[1] + (v.ylim[2] - v.ylim[1]) * rand(rng)
     return Vec2(x, y)
 end
