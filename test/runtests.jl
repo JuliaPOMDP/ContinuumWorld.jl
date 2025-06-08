@@ -12,8 +12,8 @@ using Plots
     s = Vec2(3.0, 2.0)
     a = Vec2(4.0, 2.0)
     rng = MersenneTwister(19)
-    d = transition(w, s, a, rng)
-    sp = rand(d)
+    d = transition(w, s, a)
+    sp = rand(rng, d)
     r = reward(w, s, a, sp)
 
     @test sp isa Vec2
