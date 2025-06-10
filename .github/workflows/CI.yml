@@ -1,16 +1,58 @@
 name: CI
-
-on: [push, pull_request]
+ 
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   test:
+    name: Run tests and upload coverage
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          version: '1'
-          arch: x64
-      - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-runtest@v1
+          fetch-depth: 2
+
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.9'
+
+      - name: Cache Julia packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-julia-artifacts-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-julia-artifacts-
+
+      - name: Install dependencies
+        run: |
+          julia --project -e '
+            using Pkg
+            Pkg.instantiate()
+            Pkg.add("Coverage")
+            Pkg.resolve()
+          '
+
+      - name: Run Tests
+        run: |
+          julia --project -e '
+            using Pkg
+            Pkg.test(coverage=true)
+            using Coverage
+            LCOV.writefile("lcov.info", process_folder("."))
+          '
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: Aero-Spec/ContinuumWorld.jl
+          files: lcov.info
