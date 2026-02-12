@@ -72,7 +72,7 @@ function POMDPs.reward(w::CWorld, s::AbstractVector, a::AbstractVector, sp::Abst
     return rew
 end
 
-function POMDPs.isterminal(w::CWorld, s::Vec2)
+function POMDPs.isterminal(w::CWorld, s)
     any(r -> s in r, w.terminal)
 end
 
