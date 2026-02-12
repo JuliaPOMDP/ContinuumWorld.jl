@@ -23,7 +23,7 @@ using Plots
     pol = solve(sol, w)
     @test typeof(pol) <: Policy
 
-    sim = HistoryRecorder(rng = MersenneTwister(5), max_steps = 30)
+    sim = HistoryRecorder(rng = MersenneTwister(1), max_steps = 30)
     hist = simulate(sim, w, pol)
     @test length(state_hist(hist)) > 0
 

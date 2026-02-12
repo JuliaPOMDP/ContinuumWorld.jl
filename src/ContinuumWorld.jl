@@ -4,7 +4,6 @@ using Random
 using LinearAlgebra
 using POMDPs
 using StaticArrays
-using Parameters
 using GridInterpolations
 using POMDPModels
 using POMDPTools
@@ -12,7 +11,6 @@ using Distributions
 using Statistics
 using StatsBase
 using Plots
-using Plotly
 
 export
     CWorld,
@@ -44,7 +42,7 @@ const default_regions = [
 
 const default_rewards = [-10.0, -5.0, 10.0, 3.0]
 
-@with_kw struct CWorld <: MDP{Vec2, Vec2}
+Base.@kwdef struct CWorld <: MDP{Vec2, Vec2}
     xlim::Tuple{Float64, Float64} = (0.0, 10.0)
     ylim::Tuple{Float64, Float64} = (0.0, 10.0)
     reward_regions::Vector{CircularRegion} = default_regions
@@ -84,7 +82,7 @@ struct Vec2Distribution
     d::Product # for support functions
 
     function Vec2Distribution(xlim, ylim)
-        d = Product([
+        d = product_distribution([
             Distributions.Uniform(xlim[1], xlim[2]),
             Distributions.Uniform(ylim[1], ylim[2])
         ])

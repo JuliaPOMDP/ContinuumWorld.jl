@@ -5,7 +5,7 @@ end
 
 evaluate(v::GIValue, s::AbstractVector{Float64}) = interpolate(v.grid, v.gdata, convert(Vector{Float64}, s))
 
-@with_kw mutable struct CWorldSolver{G<:AbstractGrid, RNG<:AbstractRNG} <: Solver
+Base.@kwdef mutable struct CWorldSolver{G<:AbstractGrid, RNG<:AbstractRNG} <: Solver
     grid::G                     = RectangleGrid(range(0.0, stop=10.0, length=30), range(0.0, stop=10.0, length=30))
     max_iters::Int              = 50
     tol::Float64                = 0.01
